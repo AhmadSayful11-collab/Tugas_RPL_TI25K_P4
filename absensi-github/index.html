@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Absensi Karyawan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<style>
+:root{--bg:#F3E6C5;--card:#FBF4E2;--line:#DCC9A0;--tx:#3A0A12;--tx2:#7A5A55;--ac:#550B18;--ach:#8A1C2E;--acx:#F3E6C5;--ok:#2F6B4F;--okb:#E3EBCF;--wn:#8A5A0B;--wnb:#F0DDAA;--in:#6B4A2B;--inb:#E8D6B0;--er:#9B1C1C;--erb:#F2D3CC;--page:#E8D8B2;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+:root[data-theme="dark"]{--bg:#3A0710;--card:#550B18;--line:#7A2A38;--tx:#F3E6C5;--tx2:#CDB99A;--ac:#F3E6C5;--ach:#E3CFA0;--acx:#550B18;--ok:#9AD9B5;--okb:#1F3A2C;--wn:#F0CF7A;--wnb:#5A3D12;--in:#E3CFA0;--inb:#6B1E2B;--er:#FFB4A8;--erb:#7A1F22;--page:#2A050B;color-scheme:dark}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--page);color:var(--tx);font:400 15px/1.5 Poppins,system-ui,sans-serif}
+b{font-weight:600}p{margin:0}
+.phone{width:100%;max-width:430px;height:100dvh;margin:0 auto;background:var(--bg);display:flex;flex-direction:column;position:relative;overflow:hidden}
+@media(min-width:600px){.phone{height:min(800px,calc(100dvh - 32px));margin:16px auto;border:1px solid var(--line);border-radius:22px}}
+.scr{display:none;flex:1;overflow-y:auto;padding:20px 18px}.scr.on{display:block;animation:fi .3s ease}
+@keyframes fi{from{opacity:0;transform:translateY(8px)}}
+h1{font-size:22px;margin:0 0 4px;font-weight:600}h2{font-size:16px;margin:18px 0 8px;font-weight:600}
+.mut{color:var(--tx2);font-size:13px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:14px}
+label{display:block;font-size:13px;font-weight:600;margin:14px 0 6px}
+input,select,textarea{width:100%;font:inherit;color:var(--tx);background:var(--card);border:1px solid var(--line);border-radius:6px;padding:11px 12px;min-height:44px}
+input:focus,select:focus,textarea:focus,button:focus-visible{outline:2px solid var(--ac);outline-offset:1px}
+.btn{width:100%;min-height:48px;border:0;border-radius:8px;background:linear-gradient(135deg,var(--ac),var(--ach));color:var(--acx);font:600 15px Poppins,sans-serif;cursor:pointer;margin-top:18px;box-shadow:0 6px 18px rgba(85,11,24,.3);transition:transform .15s,filter .15s}
+.btn:hover{filter:brightness(1.1)}.btn:active{transform:scale(.98)}
+.btn.sec{background:var(--card);color:var(--tx);border:1px solid var(--line);box-shadow:none}
+.btn:disabled{opacity:.45;cursor:not-allowed;box-shadow:none;filter:none}
+.lnk{background:none;border:0;color:var(--ac);font:600 13px Poppins,sans-serif;cursor:pointer;margin:16px auto 0;display:block}
+.bdg{display:inline-block;padding:2px 9px;border-radius:5px;font-size:12px;font-weight:600;white-space:nowrap}
+.ok{background:var(--okb);color:var(--ok)}.wn{background:var(--wnb);color:var(--wn)}.in{background:var(--inb);color:var(--in)}.er{background:var(--erb);color:var(--er)}
+.row{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.hero{background:linear-gradient(135deg,#550B18,#7A1424);border:0;color:#F3E6C5}.hero .mut{color:rgba(243,230,197,.8)}
+.clock{font-size:36px;font-weight:600;font-variant-numeric:tabular-nums}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.grid4 .card{padding:10px 6px;text-align:center}.grid4 b{font-size:20px;display:block}.grid4 span{font-size:11px;color:var(--tx2)}
+.nav{display:flex;border-top:1px solid var(--line);background:var(--card)}
+.nav button{flex:1;min-height:56px;border:0;background:none;color:var(--tx2);font:600 12px Poppins,sans-serif;cursor:pointer;border-top:2px solid transparent}
+.nav button.on{color:var(--ac);border-top-color:var(--ac)}
+.hide{display:none!important}
+.chk{display:flex;gap:10px;align-items:flex-start;padding:12px 0;border-bottom:1px solid var(--line)}.chk:last-child{border:0}
+.dot{width:22px;height:22px;border-radius:50%;flex:none;display:grid;place-items:center;font-size:13px;font-weight:600;background:var(--okb);color:var(--ok)}
+.selfie{height:150px;border:1px dashed var(--line);border-radius:8px;display:grid;place-items:center;color:var(--tx2);font-size:13px;background:var(--card);margin-top:12px}
+#prev{width:100%;height:190px;object-fit:cover;border-radius:8px;margin-top:12px}
+.li{padding:12px 0;border-bottom:1px solid var(--line)}.li:last-child{border:0}
+.err{color:var(--er);font-size:13px;margin-top:6px;min-height:18px}
+.toast{position:absolute;left:18px;right:18px;bottom:72px;background:var(--tx);color:var(--bg);padding:11px 14px;border-radius:8px;font-size:13px;opacity:0;transition:opacity .2s;pointer-events:none}.toast.on{opacity:1}
+.ring{width:72px;height:72px;border-radius:50%;background:conic-gradient(var(--ac) calc(var(--p)*1%),var(--line) 0);display:grid;place-items:center;position:relative;flex:none}
+.ring::before{content:"";position:absolute;inset:8px;background:var(--card);border-radius:50%}.ring b{position:relative}
+.bars{display:flex;gap:10px;height:96px}.bars div{flex:1;text-align:center;font-size:11px;color:var(--tx2);display:flex;flex-direction:column;justify-content:flex-end;gap:4px}
+.bars i{display:block;border-radius:6px 6px 2px 2px;background:linear-gradient(var(--ach),var(--ac))}.bars i.w{background:var(--wn)}.bars i.n{background:var(--line)}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;text-align:center;font-size:12px}.cal span{padding:7px 0;border-radius:8px;color:var(--tx2)}.cal .h{font-weight:600}.cal .off{opacity:.4}.cal .td{outline:2px solid var(--ac)}
+.av{width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,var(--ac),var(--ach));display:grid;place-items:center;font:600 26px Poppins,sans-serif;color:var(--acx);margin:0 auto 10px}
+.rk{display:grid;grid-template-columns:1fr repeat(4,30px);gap:6px;align-items:center;text-align:center}.rk>:first-child{text-align:left}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+@media print{body{background:#fff}.phone{height:auto;max-width:none;border:0;margin:0}.nav,.btn,.toast{display:none!important}.scr{display:none!important}#slip{display:block!important;overflow:visible}}
+</style>
+</head>
+<body>
+<div class="phone">
+
+ <!-- MASUK / DAFTAR -->
+ <section class="scr on" id="auth">
+  <div style="margin-top:40px"><h1 id="aTitle">Masuk</h1><p class="mut">Sistem Penggajian dan Absensi Karyawan</p></div>
+  <label for="nik">NIK / ID karyawan</label>
+  <input id="nik" inputmode="numeric" autocomplete="username" placeholder="Contoh: 250511145">
+  <div class="reg hide"><label for="nama">Nama lengkap</label><input id="nama" autocomplete="name"></div>
+  <div class="reg hide"><label for="jab">Jabatan</label><input id="jab" placeholder="Contoh: Staf Keuangan"></div>
+  <label for="pw">Kata sandi</label>
+  <input id="pw" type="password" autocomplete="current-password" placeholder="Minimal 6 karakter">
+  <div class="err" id="lerr"></div>
+  <button class="btn" id="bAuth" style="margin-top:6px">Masuk</button>
+  <button class="lnk" id="swAuth">Belum punya akun? Daftar</button>
+ </section>
+
+ <!-- BERANDA -->
+ <section class="scr" id="home">
+  <div class="row"><div><p class="mut">Selamat <span id="sapa">pagi</span>,</p><h1 id="hNama">-</h1></div><span class="bdg in" id="hJab">-</span></div>
+  <div class="card hero" style="margin-top:14px">
+   <p class="mut" id="tgl"></p><div class="clock" id="jam">00:00:00</div>
+   <div class="row mut" style="margin-top:6px"><span>Jam kerja 08:00 – 17:00</span><span>Toleransi 15 menit</span></div>
+  </div>
+  <h2>Absensi hari ini</h2>
+  <div class="card">
+   <div class="row"><span>Status</span><span class="bdg wn" id="stHari">Memuat…</span></div>
+   <div class="row" style="margin-top:10px"><div><p class="mut">Masuk</p><b id="hMasuk">--:--</b></div><div><p class="mut">Pulang</p><b id="hPulang">--:--</b></div><div><p class="mut">Durasi</p><b id="hDur">--</b></div></div>
+  </div>
+  <button class="btn" id="bAbsen" data-go="absen">Absen masuk</button>
+  <h2>Ringkasan bulan ini</h2>
+  <div class="grid4"><div class="card"><b id="hH">0</b><span>Hadir</span></div><div class="card"><b id="hT">0</b><span>Terlambat</span></div><div class="card"><b id="hI">0</b><span>Izin</span></div><div class="card"><b id="hA">0</b><span>Alpa</span></div></div>
+  <h2>Kehadiran bulan ini</h2>
+  <div class="card row"><div class="ring" id="ring" style="--p:0"><b id="pct">0%</b></div><div style="flex:1"><b>Persentase hadir</b><p class="mut">Dihitung dari hari kerja yang sudah berlalu bulan ini.</p></div></div>
+  <h2>Minggu ini</h2>
+  <div class="card"><div class="bars" id="wk"></div></div>
+ </section>
+
+ <!-- VERIFIKASI ABSEN -->
+ <section class="scr" id="absen">
+  <button class="btn sec" style="width:auto;min-height:40px;padding:0 14px;margin:0 0 12px" data-go="home">Kembali</button>
+  <h1 id="aJudul">Absen masuk</h1><p class="mut">Tiga pemeriksaan harus sesuai sebelum absen disimpan.</p>
+  <div class="card" style="margin-top:14px">
+   <div class="chk"><span class="dot">✓</span><div><b>Waktu</b><p class="mut" id="aJam">--:--</p></div></div>
+   <div class="chk"><span class="dot" id="lDot">…</span><div><b>Lokasi</b><p class="mut" id="lTxt">Mencari lokasi…</p></div></div>
+   <div class="chk"><span class="dot" id="fDot" style="background:var(--wnb);color:var(--wn)">!</span><div><b>Foto wajah</b><p class="mut" id="fTxt">Belum diambil</p></div></div>
+  </div>
+  <div class="selfie" id="selfie">Area foto selfie</div>
+  <img id="prev" class="hide" alt="Foto selfie">
+  <input type="file" id="fFoto" accept="image/*" capture="user" class="hide">
+  <button class="btn sec" id="bFoto">Ambil foto</button>
+  <button class="btn" id="bKonf" style="margin-top:10px" disabled>Konfirmasi absen masuk</button>
+ </section>
+
+ <!-- HASIL -->
+ <section class="scr" id="hasil">
+  <div style="text-align:center;margin-top:36px"><span class="dot" style="width:56px;height:56px;font-size:26px;margin:0 auto 12px">✓</span>
+  <h1 id="rJudul">Absen tercatat</h1><span class="bdg ok" id="rStat">Hadir</span></div>
+  <div class="card" style="margin-top:20px">
+   <div class="row li" style="padding-top:0"><span class="mut">Waktu</span><b id="rJam"></b></div>
+   <div class="row li"><span class="mut">Lokasi</span><b id="rLok"></b></div>
+   <div class="row li" style="border:0;padding-bottom:0"><span class="mut">Keterangan</span><b id="rKet" style="text-align:right"></b></div>
+  </div>
+  <button class="btn" data-go="home">Kembali ke beranda</button>
+  <button class="btn sec" data-go="riwayat">Lihat riwayat</button>
+ </section>
+
+ <!-- RIWAYAT -->
+ <section class="scr" id="riwayat">
+  <h1>Riwayat absensi</h1>
+  <select id="bln" aria-label="Pilih bulan" style="margin-top:10px"></select>
+  <div class="grid4" style="margin-top:12px"><div class="card"><b id="rH">0</b><span>Hadir</span></div><div class="card"><b id="rT">0</b><span>Terlambat</span></div><div class="card"><b id="rI">0</b><span>Izin</span></div><div class="card"><b id="rA">0</b><span>Alpa</span></div></div>
+  <h2>Kalender</h2>
+  <div class="card"><div class="cal" id="cal"></div></div>
+  <h2>Per hari</h2>
+  <div class="card" id="listR"></div>
+ </section>
+
+ <!-- IZIN -->
+ <section class="scr" id="izin">
+  <h1>Pengajuan izin</h1><p class="mut">Izin, sakit, atau cuti. Disetujui oleh Admin HRD.</p>
+  <label for="jenis">Jenis</label>
+  <select id="jenis"><option>Izin</option><option>Sakit</option><option>Cuti tahunan</option></select>
+  <div class="row" style="gap:10px;align-items:flex-start"><div style="flex:1"><label for="d1">Mulai</label><input id="d1" type="date"></div><div style="flex:1"><label for="d2">Selesai</label><input id="d2" type="date"></div></div>
+  <label for="alasan">Alasan</label>
+  <textarea id="alasan" rows="3" placeholder="Tulis alasan singkat"></textarea>
+  <div class="err" id="ierr"></div>
+  <button class="btn" id="bKirim" style="margin-top:6px">Kirim pengajuan</button>
+  <h2>Status pengajuan</h2>
+  <div class="card" id="listI"></div>
+ </section>
+
+ <!-- PROFIL -->
+ <section class="scr" id="profil">
+  <div style="text-align:center;margin-top:12px"><div class="av" id="pAv">-</div><h1 id="pNama">-</h1><p class="mut" id="pSub"></p></div>
+  <label for="tel">Nomor telepon</label>
+  <input id="tel" type="tel" inputmode="tel" placeholder="Contoh: 0831xxxxxxx">
+  <button class="btn sec" id="bTel" style="margin-top:10px">Simpan nomor telepon</button>
+  <h2>Notifikasi</h2>
+  <div class="card" id="listN"></div>
+  <button class="btn" data-go="slip">Lihat slip gaji</button>
+  <button class="btn sec" id="bTema" style="margin-top:10px">Ganti tema terang / gelap</button>
+  <button class="btn sec" id="bOut" style="margin-top:10px;color:var(--er)">Keluar</button>
+ </section>
+
+ <!-- SLIP GAJI -->
+ <section class="scr" id="slip">
+  <button class="btn sec" style="width:auto;min-height:40px;padding:0 14px;margin:0 0 12px" data-go="profil">Kembali</button>
+  <h1>Slip gaji</h1>
+  <select id="bln2" aria-label="Pilih periode" style="margin-top:10px"></select>
+  <div class="card hero" style="margin-top:14px"><p class="mut">Gaji bersih diterima</p><div class="clock" id="sNet">Rp 0</div></div>
+  <h2>Pendapatan</h2><div class="card" id="sIn"></div>
+  <h2>Potongan</h2><div class="card" id="sOut"></div>
+  <button class="btn" onclick="window.print()">Cetak / simpan PDF</button>
+ </section>
+
+ <!-- ADMIN HRD -->
+ <section class="scr" id="admin">
+  <h1>Admin HRD</h1><p class="mut">Persetujuan izin dan rekap seluruh karyawan.</p>
+  <div class="row" style="margin-top:12px"><button class="btn" data-at="izin" style="margin:0;min-height:40px">Izin</button><button class="btn sec" data-at="rekap" style="margin:0;min-height:40px">Rekap</button></div>
+  <div id="aIzin"><h2>Menunggu persetujuan</h2><div class="card" id="aWait"></div><h2>Riwayat terbaru</h2><div class="card" id="aDone"></div></div>
+  <div id="aRekap" class="hide"><select id="bln3" aria-label="Pilih bulan" style="margin-top:12px"></select>
+   <div class="card" id="aTab" style="margin-top:12px"></div><p class="mut" style="margin-top:8px">H = Hadir, T = Terlambat, I = Izin, A = Alpa</p>
+   <button class="btn sec" id="bCsv">Unduh CSV (Excel)</button></div>
+ </section>
+
+ <nav class="nav hide" id="nav">
+  <button data-go="home" class="on">Beranda</button><button data-go="riwayat">Riwayat</button><button data-go="izin">Izin</button><button data-go="profil">Profil</button><button data-go="admin" id="nAdm" class="hide">Admin</button>
+ </nav>
+ <div class="toast" id="toast"></div>
+</div>
+
+<script>
+/* ===== ISI BAGIAN INI (lihat README.md) ===== */
+const CFG={
+ url:"ISI_SUPABASE_URL",
+ key:"ISI_SUPABASE_ANON_KEY",
+ office:{name:"Kantor Pusat",lat:-6.3264,lng:108.3199,radius:100}
+};
+/* ============================================ */
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const pad=n=>String(n).padStart(2,"0"),hm=d=>pad(d.getHours())+":"+pad(d.getMinutes()),ymd=d=>d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());
+const rp=n=>"Rp "+Math.round(n).toLocaleString("id-ID");
+const BLN=["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"],HR=["Min","Sen","Sel","Rab","Kam","Jum","Sab"];
+const email=n=>n+"@absensi.app";
+const configured=!CFG.url.startsWith("ISI_");
+const sb=configured?supabase.createClient(CFG.url,CFG.key):null;
+let me=null,prof=null,today=null,mode="masuk",foto=null,jarak=null,regMode=false;
+try{const t=localStorage.getItem("tema");if(t)document.documentElement.dataset.theme=t}catch(e){}
+
+function toast(t){const e=$("#toast");e.textContent=t;e.classList.add("on");setTimeout(()=>e.classList.remove("on"),2600)}
+function go(id){
+ if(id!=="auth"&&!me)id="auth";
+ $$(".scr").forEach(s=>s.classList.toggle("on",s.id===id));
+ $("#nav").classList.toggle("hide",!["home","riwayat","izin","profil","admin"].includes(id));
+ $$(".nav [data-go]").forEach(b=>b.classList.toggle("on",b.dataset.go===id));
+ ({home:loadHome,absen:prep,riwayat:loadRiwayat,izin:loadIzin,profil:loadProfil,slip:loadSlip,admin:loadAdmin})[id]?.();
+ $(".scr.on").scrollTop=0;
+}
+document.addEventListener("click",e=>{const b=e.target.closest("[data-go]");if(b&&!b.disabled)go(b.dataset.go)});
+function tick(){const d=new Date();$("#jam").textContent=[d.getHours(),d.getMinutes(),d.getSeconds()].map(pad).join(":");
+ $("#tgl").textContent=d.toLocaleDateString("id-ID",{weekday:"long",day:"numeric",month:"long",year:"numeric"});
+ const h=d.getHours();$("#sapa").textContent=h<11?"pagi":h<15?"siang":h<18?"sore":"malam";$("#aJam").textContent=hm(d)+" WIB"}
+setInterval(tick,1000);tick();
+
+/* ---------- Masuk / daftar ---------- */
+$("#swAuth").onclick=()=>{regMode=!regMode;$$(".reg").forEach(e=>e.classList.toggle("hide",!regMode));
+ $("#bAuth").textContent=regMode?"Daftar":"Masuk";$("#aTitle").textContent=regMode?"Buat akun":"Masuk";
+ $("#swAuth").textContent=regMode?"Sudah punya akun? Masuk":"Belum punya akun? Daftar";$("#lerr").textContent=""};
+$("#bAuth").onclick=async()=>{
+ const err=m=>{$("#lerr").textContent=m},b=$("#bAuth"),n=$("#nik").value.trim(),p=$("#pw").value;
+ if(!configured)return err("Supabase belum diatur. Isi url dan key di index.html.");
+ if(!/^\d{4,}$/.test(n))return err("NIK harus berupa angka, minimal 4 digit.");
+ if(p.length<6)return err("Kata sandi minimal 6 karakter.");
+ err("");b.disabled=true;let r;
+ if(regMode){const nama=$("#nama").value.trim();
+  if(!nama){b.disabled=false;return err("Nama lengkap belum diisi.")}
+  r=await sb.auth.signUp({email:email(n),password:p,options:{data:{nik:n,nama,jabatan:$("#jab").value.trim()||"Karyawan"}}});
+  if(!r.error&&!r.data.session){b.disabled=false;return err("Akun dibuat, tapi Confirm email masih aktif di Supabase. Matikan dulu, lalu masuk.")}
+ }else r=await sb.auth.signInWithPassword({email:email(n),password:p});
+ b.disabled=false;
+ if(r.error)return err(/already/i.test(r.error.message)?"NIK sudah terdaftar.":/invalid/i.test(r.error.message)?"NIK atau kata sandi salah.":r.error.message);
+ $("#pw").value="";boot(r.data.session)};
+async function boot(s){me=s.user;
+ const {data}=await sb.from("profiles").select("*").eq("id",me.id).single();
+ prof=data||{nama:"Karyawan",nik:"",jabatan:"Karyawan"};$("#nAdm").classList.toggle("hide",prof.role!=="hrd");go("home")}
+$("#bOut").onclick=async()=>{await sb.auth.signOut();me=prof=null;$("#nAdm").classList.add("hide");go("auth")};
+(async()=>{if(!configured){$("#lerr").textContent="Supabase belum diatur. Isi url dan key di index.html.";return}
+ const {data}=await sb.auth.getSession();if(data.session)boot(data.session)})();
+
+const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+/* ---------- Data bulanan ---------- */
+async function monthData(d){
+ const y=d.getFullYear(),mo=d.getMonth(),n=new Date(y,mo+1,0).getDate(),a=ymd(new Date(y,mo,1)),z=ymd(new Date(y,mo,n));
+ const [r1,r2]=await Promise.all([
+  sb.from("absensi").select("*").eq("user_id",me.id).gte("tanggal",a).lte("tanggal",z),
+  sb.from("izin").select("*").eq("user_id",me.id).eq("status","Disetujui").lte("mulai",z).gte("selesai",a)]);
+ const ab={};(r1.data||[]).forEach(x=>ab[x.tanggal]=x);
+ const iz=r2.data||[],t=ymd(new Date()),days=[],c={ok:0,wn:0,in:0,er:0};
+ for(let i=1;i<=n;i++){
+  const dt=new Date(y,mo,i),k=ymd(dt),w=dt.getDay(),row=ab[k];let cls="",label="";
+  if(w>0&&w<6&&k<=t){
+   if(row){cls=row.status==="Terlambat"?"wn":"ok";label=cls==="wn"?"Terlambat "+row.terlambat_menit+" menit":"Hadir"}
+   else if(iz.some(x=>x.mulai<=k&&x.selesai>=k)){cls="in";label="Izin"}
+   else if(k<t){cls="er";label="Alpa"}}
+  if(cls)c[cls]++;
+  days.push({i,k,w,cls,label,row})}
+ return{days,c,y,mo}}
+function setSum(c,p){$("#"+p+"H").textContent=c.ok;$("#"+p+"T").textContent=c.wn;$("#"+p+"I").textContent=c.in;$("#"+p+"A").textContent=c.er}
+function monthOpts(sel){if(sel.options.length)return;const n=new Date();
+ for(let i=0;i<4;i++){const d=new Date(n.getFullYear(),n.getMonth()-i,1);sel.add(new Option(BLN[d.getMonth()]+" "+d.getFullYear(),d.getFullYear()+"-"+pad(d.getMonth()+1)))}}
+const selDate=v=>{const [y,m]=v.split("-");return new Date(+y,+m-1,1)};
+
+/* ---------- Beranda ---------- */
+async function loadHome(){
+ $("#hNama").textContent=prof.nama;$("#hJab").textContent=prof.jabatan||"Karyawan";
+ const {data}=await sb.from("absensi").select("*").eq("user_id",me.id).eq("tanggal",ymd(new Date())).maybeSingle();today=data;
+ const s=$("#stHari"),b=$("#bAbsen");
+ $("#hMasuk").textContent=data?.masuk?hm(new Date(data.masuk)):"--:--";
+ $("#hPulang").textContent=data?.pulang?hm(new Date(data.pulang)):"--:--";
+ if(data?.masuk&&data?.pulang){const m=Math.round((new Date(data.pulang)-new Date(data.masuk))/6e4);$("#hDur").textContent=Math.floor(m/60)+" j "+m%60+" m"}else $("#hDur").textContent="--";
+ if(!data){s.className="bdg wn";s.textContent="Belum absen";b.textContent="Absen masuk";b.disabled=false;mode="masuk"}
+ else if(!data.pulang){s.className="bdg "+(data.status==="Terlambat"?"wn":"ok");s.textContent=data.status;b.textContent="Absen pulang";b.disabled=false;mode="pulang"}
+ else{s.className="bdg ok";s.textContent="Selesai hari ini";b.textContent="Absensi hari ini selesai";b.disabled=true}
+ const m=await monthData(new Date());setSum(m.c,"h");
+ const tot=m.c.ok+m.c.wn+m.c.in+m.c.er,p=tot?Math.round((m.c.ok+m.c.wn)/tot*100):0;
+ $("#ring").style.setProperty("--p",p);$("#pct").textContent=p+"%";
+ const mon=new Date();mon.setDate(mon.getDate()-((mon.getDay()+6)%7));
+ const {data:wk}=await sb.from("absensi").select("tanggal,masuk,pulang,status").eq("user_id",me.id).gte("tanggal",ymd(mon));
+ $("#wk").innerHTML=["Sen","Sel","Rab","Kam","Jum"].map((h,i)=>{const d=new Date(mon);d.setDate(mon.getDate()+i);
+  const r=(wk||[]).find(x=>x.tanggal===ymd(d));let ht=8,c="n";
+  if(r){c=r.status==="Terlambat"?"w":"";ht=r.pulang?Math.min(100,(new Date(r.pulang)-new Date(r.masuk))/324e5*100+8):45}
+  return `<div><i class="${c}" style="height:${ht}%"></i>${h}</div>`}).join("")}
+
+/* ---------- Absen ---------- */
+const setDot=(id,ok,t)=>{const e=$("#"+id);e.style.cssText=ok?"":"background:var(--wnb);color:var(--wn)";e.textContent=t||(ok?"✓":"!")};
+const dist=(a,b,o)=>{const R=6371000,r=x=>x*Math.PI/180,dl=r(o.lat-a),dg=r(o.lng-b),h=Math.sin(dl/2)**2+Math.cos(r(a))*Math.cos(r(o.lat))*Math.sin(dg/2)**2;return 2*R*Math.asin(Math.sqrt(h))};
+const chk=()=>{$("#bKonf").disabled=!(foto&&jarak!==null&&jarak<=CFG.office.radius)};
+function prep(){foto=null;jarak=null;$("#aJudul").textContent="Absen "+mode;$("#bKonf").textContent="Konfirmasi absen "+mode;$("#bKonf").disabled=true;
+ setDot("fDot",false);$("#fTxt").textContent="Belum diambil";$("#prev").classList.add("hide");$("#selfie").classList.remove("hide");
+ setDot("lDot",false,"…");$("#lTxt").textContent="Mencari lokasi…";
+ if(!navigator.geolocation){$("#lTxt").textContent="Browser ini tidak mendukung lokasi.";setDot("lDot",false,"✕");return}
+ navigator.geolocation.getCurrentPosition(p=>{jarak=dist(p.coords.latitude,p.coords.longitude,CFG.office);const ok=jarak<=CFG.office.radius;
+  $("#lTxt").textContent=(ok?"Di dalam area kantor":"Di luar area kantor")+", jarak "+Math.round(jarak)+" m (batas "+CFG.office.radius+" m)";setDot("lDot",ok,ok?"✓":"✕");chk()},
+  ()=>{$("#lTxt").textContent="Izin lokasi ditolak. Aktifkan lokasi di pengaturan browser, lalu buka ulang halaman ini.";setDot("lDot",false,"✕")},{enableHighAccuracy:true,timeout:15000})}
+$("#bFoto").onclick=()=>$("#fFoto").click();
+$("#fFoto").onchange=e=>{const f=e.target.files[0];if(!f)return;foto=f;
+ $("#prev").src=URL.createObjectURL(f);$("#prev").classList.remove("hide");$("#selfie").classList.add("hide");
+ setDot("fDot",true);$("#fTxt").textContent="Foto berhasil diambil";chk()};
+$("#bKonf").onclick=async()=>{
+ const b=$("#bKonf");b.disabled=true;b.textContent="Menyimpan…";
+ const now=new Date(),tg=ymd(now),min=now.getHours()*60+now.getMinutes();let stat,ket,cls;
+ try{
+  const path=`${me.id}/${tg}-${mode}.jpg`;
+  const up=await sb.storage.from("selfie").upload(path,foto,{upsert:true,contentType:foto.type||"image/jpeg"});
+  if(up.error)throw up.error;
+  if(mode==="masuk"){const late=min-480,isLate=late>15;
+   const r=await sb.from("absensi").insert({user_id:me.id,tanggal:tg,masuk:now.toISOString(),status:isLate?"Terlambat":"Hadir",terlambat_menit:isLate?late:0,jarak_m:Math.round(jarak),foto_masuk:path});
+   if(r.error)throw r.error;
+   cls=isLate?"wn":"ok";stat=isLate?"Terlambat":"Hadir tepat waktu";ket=isLate?"Terlambat "+late+" menit dari 08:00":"Sebelum batas 08:15"}
+  else{const early=min<1020;
+   const r=await sb.from("absensi").update({pulang:now.toISOString(),foto_pulang:path}).eq("id",today.id);
+   if(r.error)throw r.error;
+   cls=early?"wn":"ok";stat=early?"Pulang cepat":"Pulang sesuai jam";ket=early?"Sebelum jam 17:00":"Jam kerja terpenuhi"}
+ }catch(e){toast("Gagal menyimpan: "+e.message);b.disabled=false;b.textContent="Konfirmasi absen "+mode;return}
+ $("#rJudul").textContent="Absen "+mode+" tercatat";$("#rStat").className="bdg "+cls;$("#rStat").textContent=stat;$("#rKet").textContent=ket;
+ $("#rJam").textContent=hm(now)+" WIB";$("#rLok").textContent=CFG.office.name+" ("+Math.round(jarak)+" m)";go("hasil")};
+
+/* ---------- Riwayat ---------- */
+async function loadRiwayat(){
+ monthOpts($("#bln"));const md=await monthData(selDate($("#bln").value));setSum(md.c,"r");
+ const first=new Date(md.y,md.mo,1).getDay(),t=ymd(new Date());
+ $("#cal").innerHTML=HR.map(h=>`<span class="h">${h}</span>`).join("")+"<span></span>".repeat(first)+
+  md.days.map(d=>`<span class="${d.cls||"off"}${d.k===t?" td":""}">${d.i}</span>`).join("");
+ const L=md.days.filter(d=>d.cls).reverse();
+ $("#listR").innerHTML=L.length?L.map((d,i)=>`<div class="li row" ${i?"":'style="padding-top:0"'}><div><b>${HR[d.w]}, ${d.i} ${BLN[md.mo].slice(0,3)}</b><p class="mut">${d.row?"Masuk "+(d.row.masuk?hm(new Date(d.row.masuk)):"--:--")+" · Pulang "+(d.row.pulang?hm(new Date(d.row.pulang)):"--:--"):"Tidak ada catatan absen"}</p></div><span class="bdg ${d.cls}">${d.label}</span></div>`).join(""):'<p class="mut">Belum ada data absensi bulan ini. Mulai dari tombol Absen masuk di Beranda.</p>'}
+$("#bln").onchange=loadRiwayat;
+
+/* ---------- Izin ---------- */
+const stCls={Menunggu:"wn",Disetujui:"ok",Ditolak:"er"};
+async function loadIzin(){
+ const {data}=await sb.from("izin").select("*").eq("user_id",me.id).order("created_at",{ascending:false}).limit(10);
+ $("#listI").innerHTML=data?.length?data.map((x,i)=>`<div class="li row" ${i?"":'style="padding-top:0"'}><div><b>${x.jenis}</b><p class="mut">${x.mulai} s/d ${x.selesai}, ${esc(x.alasan)}</p></div><span class="bdg ${stCls[x.status]||"in"}">${x.status}</span></div>`).join(""):'<p class="mut">Belum ada pengajuan. Isi form di atas untuk mengajukan.</p>'}
+$("#bKirim").onclick=async()=>{const a=$("#d1").value,b=$("#d2").value,r=$("#alasan").value.trim(),e=m=>{$("#ierr").textContent=m};
+ if(!a||!b)return e("Tanggal mulai dan selesai wajib diisi.");
+ if(b<a)return e("Tanggal selesai tidak boleh sebelum tanggal mulai.");
+ if(!r)return e("Alasan belum diisi.");
+ e("");const x=await sb.from("izin").insert({user_id:me.id,jenis:$("#jenis").value,mulai:a,selesai:b,alasan:r});
+ if(x.error)return e("Gagal mengirim: "+x.error.message);
+ $("#alasan").value="";toast("Pengajuan terkirim ke Admin HRD");loadIzin()};
+
+/* ---------- Profil ---------- */
+async function loadProfil(){
+ $("#pAv").textContent=prof.nama.split(" ").slice(0,2).map(w=>w[0]).join("").toUpperCase();
+ $("#pNama").textContent=prof.nama;$("#pSub").textContent="NIK "+prof.nik+" · "+(prof.jabatan||"Karyawan");$("#tel").value=prof.telepon||"";
+ const {data}=await sb.from("izin").select("*").eq("user_id",me.id).order("created_at",{ascending:false}).limit(3);
+ $("#listN").innerHTML=data?.length?data.map((x,i)=>`<div class="li row" ${i?"":'style="padding-top:0"'}><div><b>Pengajuan ${x.jenis}</b><p class="mut">${x.mulai} s/d ${x.selesai}</p></div><span class="bdg ${stCls[x.status]||"in"}">${x.status}</span></div>`).join(""):'<p class="mut">Belum ada notifikasi.</p>'}
+$("#bTel").onclick=async()=>{const t=$("#tel").value.trim(),r=await sb.from("profiles").update({telepon:t}).eq("id",me.id);
+ if(r.error)return toast("Gagal menyimpan: "+r.error.message);prof.telepon=t;toast("Nomor telepon tersimpan")};
+$("#bTema").onclick=()=>{const r=document.documentElement,t=r.dataset.theme==="dark"?"light":"dark";r.dataset.theme=t;try{localStorage.setItem("tema",t)}catch(e){}};
+
+/* ---------- Slip gaji ---------- */
+async function loadSlip(){
+ monthOpts($("#bln2"));const md=await monthData(selDate($("#bln2").value)),hadir=md.c.ok+md.c.wn,gaji=+prof.gaji_pokok||0;
+ const inc=[["Gaji pokok",gaji],["Tunjangan transport ("+hadir+" hari)",hadir*15000],["Tunjangan makan ("+hadir+" hari)",hadir*20000]],
+  out=[["Terlambat ("+md.c.wn+"x)",md.c.wn*25000],["Alpa ("+md.c.er+" hari)",md.c.er*(gaji/22)],["BPJS (4%)",gaji*.04]];
+ const f=a=>a.map((x,i)=>`<div class="li row" ${i?"":'style="padding-top:0"'}><span>${x[0]}</span><b>${rp(x[1])}</b></div>`).join("");
+ $("#sIn").innerHTML=f(inc);$("#sOut").innerHTML=f(out);
+ $("#sNet").textContent=rp(inc.reduce((s,x)=>s+x[1],0)-out.reduce((s,x)=>s+x[1],0))}
+$("#bln2").onchange=loadSlip;
+
+/* ---------- Admin HRD ---------- */
+let admTab="izin",REK=null;
+async function allRows(mk){let o=[],f=0;for(;;){const r=await mk().range(f,f+999);if(r.error)throw r.error;o=o.concat(r.data);if(r.data.length<1000)return o;f+=1000}}
+$$("[data-at]").forEach(b=>b.onclick=()=>{admTab=b.dataset.at;loadAdmin()});
+async function loadAdmin(){
+ if(prof.role!=="hrd"){go("home");return}
+ $$("[data-at]").forEach(b=>b.classList.toggle("sec",b.dataset.at!==admTab));
+ $("#aIzin").classList.toggle("hide",admTab!=="izin");$("#aRekap").classList.toggle("hide",admTab!=="rekap");
+ try{const pr=await allRows(()=>sb.from("profiles").select("id,nik,nama,jabatan").order("nama").order("id"));
+  if(admTab==="izin"){const P={};pr.forEach(p=>P[p.id]=p);await admIzin(P)}else{monthOpts($("#bln3"));await admRekap(pr)}
+ }catch(e){toast("Gagal memuat: "+e.message)}}
+async function admIzin(P){
+ const r=await sb.from("izin").select("*").order("created_at",{ascending:false}).limit(60);if(r.error)throw r.error;
+ const item=(x,b)=>`<div class="li"><div class="row"><b>${esc(P[x.user_id]?.nama||"?")}</b><span class="bdg ${stCls[x.status]||"in"}">${esc(x.status)}</span></div><p class="mut">${esc(x.jenis)} · ${x.mulai} s/d ${x.selesai}</p><p class="mut">${esc(x.alasan)}</p>${b}</div>`;
+ const w=r.data.filter(x=>x.status==="Menunggu"),d=r.data.filter(x=>x.status!=="Menunggu");
+ const btn=x=>`<div class="row" style="margin-top:8px"><button class="btn" data-id="${x.id}" data-s="Disetujui" style="margin:0;min-height:40px;flex:1">Setujui</button><button class="btn sec" data-id="${x.id}" data-s="Ditolak" style="margin:0;min-height:40px;flex:1">Tolak</button></div>`;
+ $("#aWait").innerHTML=w.length?w.map(x=>item(x,btn(x))).join(""):'<p class="mut">Tidak ada pengajuan yang menunggu.</p>';
+ $("#aDone").innerHTML=d.length?d.map(x=>item(x,"")).join(""):'<p class="mut">Belum ada riwayat.</p>'}
+$("#aWait").onclick=async e=>{const b=e.target.closest("[data-id]");if(!b)return;b.disabled=true;
+ const r=await sb.from("izin").update({status:b.dataset.s}).eq("id",b.dataset.id);
+ if(r.error){b.disabled=false;return toast("Gagal: "+r.error.message)}toast("Pengajuan "+b.dataset.s.toLowerCase());loadAdmin()};
+async function admRekap(pr){
+ const d=selDate($("#bln3").value),y=d.getFullYear(),mo=d.getMonth(),n=new Date(y,mo+1,0).getDate(),a=ymd(d),z=ymd(new Date(y,mo,n)),t=ymd(new Date());
+ const [ab,iz]=await Promise.all([allRows(()=>sb.from("absensi").select("user_id,tanggal,status").gte("tanggal",a).lte("tanggal",z).order("id")),
+  allRows(()=>sb.from("izin").select("user_id,mulai,selesai").eq("status","Disetujui").lte("mulai",z).gte("selesai",a).order("id"))]);
+ const rows=pr.map(p=>{const m={};ab.filter(x=>x.user_id===p.id).forEach(x=>m[x.tanggal]=x);
+  const my=iz.filter(x=>x.user_id===p.id),c={H:0,T:0,I:0,A:0};
+  for(let i=1;i<=n;i++){const k=y+"-"+pad(mo+1)+"-"+pad(i),w=new Date(y,mo,i).getDay();if(w<1||w>5||k>t)continue;
+   if(m[k])c[m[k].status==="Terlambat"?"T":"H"]++;else if(my.some(x=>x.mulai<=k&&x.selesai>=k))c.I++;else if(k<t)c.A++}
+  return{p,...c}});
+ REK={rows,key:y+"-"+pad(mo+1)};
+ $("#aTab").innerHTML='<div class="rk mut"><b>Karyawan</b><b>H</b><b>T</b><b>I</b><b>A</b></div>'+(rows.length?rows.map(r=>`<div class="rk li"><div><b>${esc(r.p.nama)}</b><p class="mut">${esc(r.p.nik)}</p></div><span>${r.H}</span><span>${r.T}</span><span>${r.I}</span><span>${r.A}</span></div>`).join(""):'<p class="mut">Belum ada karyawan.</p>')}
+$("#bln3").onchange=loadAdmin;
+$("#bCsv").onclick=()=>{if(!REK)return;const q=v=>{v=String(v==null?"":v);if(/^[=+\-@]/.test(v))v="'"+v;return'"'+v.replace(/"/g,'""')+'"'};
+ const s=["NIK,Nama,Jabatan,Hadir,Terlambat,Izin,Alpa"].concat(REK.rows.map(r=>[r.p.nik,r.p.nama,r.p.jabatan,r.H,r.T,r.I,r.A].map(q).join(","))).join("\r\n");
+ const a=document.createElement("a");a.href=URL.createObjectURL(new Blob(["\ufeff"+s],{type:"text/csv"}));a.download="rekap-absensi-"+REK.key+".csv";a.click()};
+</script>
+</body>
+</html>
